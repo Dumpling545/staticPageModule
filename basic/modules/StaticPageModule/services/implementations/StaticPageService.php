@@ -111,6 +111,7 @@ class StaticPageService implements IStaticPageService{
                 $model->tags = array_column($this->pageRepository->getTagsOfPage($this->getIdBySlug($slug)), 'tagName');
                 return $model;
             } catch(\Exception $e){
+                Yii::error('Not Allowed: Error at line '.$e->getLine().' in file '.$e->getFile().' : '.$e->getMessage());
                 throw new \Exception("You are not allowed to do this action");
             }
         } else {
