@@ -26,11 +26,12 @@ class StaticPageService implements IStaticPageService{
     private function createPageWithoutCategory(CreatePageModel $model, string $author){
         $cache = Yii::$app->cache;
         if(!$cache->exists(Constants::PAGE_ID_KEY)){
-            $cache->add(Constants::PAGE_ID_KEY, -1);
+            $cache->add(Constants::PAGE_ID_KEY, 0);
         }
         $cache[Constants::PAGE_ID_KEY] = $cache[Constants::PAGE_ID_KEY] + 1;
         
         $entity = new StaticPage();
+        Yii::error($cache[Constants::PAGE_ID_KEY]);
         $entity->id = $cache[Constants::PAGE_ID_KEY];
         $entity->author = $author;
         $entity->accessibilityStatus = $model->accessibilityStatus;

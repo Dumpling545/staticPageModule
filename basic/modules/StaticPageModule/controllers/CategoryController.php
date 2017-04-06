@@ -48,6 +48,7 @@ class CategoryController extends Controller{
 
     public function actionCreateCategory(){
         $status = 0;
+        Yii::info(strval(Yii::$app->cache[Constants::CATEGORY_ID_KEY]));
         if(Yii::$app->user->identity->username == "admin")
             $status = Constants::ADMIN;
         else

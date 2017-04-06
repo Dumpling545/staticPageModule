@@ -103,7 +103,7 @@ class CategoryService implements ICategoryService{
             $entity->accessibilityStatus = $model->accessibilityStatus;
             $cache = Yii::$app->cache;
             if(!$cache->exists(Constants::CATEGORY_ID_KEY)){
-                $cache->add(Constants::CATEGORY_ID_KEY, -1);
+                $cache->add(Constants::CATEGORY_ID_KEY, 0);
             }
             $cache[Constants::CATEGORY_ID_KEY] = $cache[Constants::CATEGORY_ID_KEY] + 1;
             $entity->id = $cache[Constants::CATEGORY_ID_KEY];
