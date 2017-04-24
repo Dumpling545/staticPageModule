@@ -19,6 +19,7 @@ class CategoryRepository implements ICategoryRepository{
     public function createCategory(Category $entity) {
         if(!empty($entity)){
             Yii::$app->db->createCommand()->insert($this->tableName, get_object_vars($entity))->execute();
+            return Yii::$app->db->createCommand('SELECT MAX(id) FROM '.$this->tableName)->queryOne()['MAX(id)'];
         } else {
             throw new InvalidArgumentException();
         }

@@ -36,15 +36,21 @@ class StaticPageRepository implements IStaticPageRepository{
         if(!empty($entity) && $entity->header != null){
             $db = Yii::$app->db;
             $transaction = $db->beginTransaction();
+            
             try {
-                $db->createCommand()->insert($this->pagesTableName, get_object_vars($entity))->execute();
-                for($i = 0; $i < count($tagsToEntity); $i++){
-                    $ttP = $db->createCommand();
-                    $ttP->insert($this->tagToPageTablename, get_object_vars($tagsToEntity[$i]))->execute();
-                }
                 if(!empty($category) && $category->name != null)
                     $db->createCommand()->insert($this->categoryTableName, get_object_vars($category))->execute();
+                $categoryId = Yii::$app->db->createCommand('SELECT MAX(id) FROM '.$this->categoryTableName)->queryOne()['MAX(id)'];
+                $entity->categoryId = $categoryId;
+                $db->createCommand()->insert($this->pagesTableName, get_object_vars($entity))->execute();
+                $id = Yii::$app->db->createCommand('SELECT MAX(id) FROM '.$this->tableName)->queryOne()['MAX(id)'];
+                for($i = 0; $i < count($tagsToEntity); $i++){
+                    $ttP = $db->createCommand();
+                    $tagsToEntity[$i]->pageId = $id;
+                    $ttP->insert($this->tagToPageTablename, get_object_vars($tagsToEntity[$i]))->execute();
+                }
                 $transaction->commit();
+                return $id;
             } catch(\Exception $e) {
                 $transaction->rollBack();
                 throw $e;

@@ -101,17 +101,11 @@ class CategoryService implements ICategoryService{
         try{
             $entity = new Category();
             $entity->accessibilityStatus = $model->accessibilityStatus;
-            $cache = Yii::$app->cache;
-            if(!$cache->exists(Constants::CATEGORY_ID_KEY)){
-                $cache->add(Constants::CATEGORY_ID_KEY, 0);
-            }
-            $cache[Constants::CATEGORY_ID_KEY] = $cache[Constants::CATEGORY_ID_KEY] + 1;
-            $entity->id = $cache[Constants::CATEGORY_ID_KEY];
+            $entity->id = -1;
             $entity->name = $model->name;
             $entity->slug = $model->slug;
             $entity->parentId = $model->parentId;
-            $this->categoryRepository->createCategory($entity);
-            return $cache[Constants::CATEGORY_ID_KEY];
+            return $this->categoryRepository->createCategory($entity);
         } catch(\Exception $e){
             throw $e;
         }

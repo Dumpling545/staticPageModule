@@ -24,15 +24,7 @@ class StaticPageService implements IStaticPageService{
         $this->categoryRepository = new CategoryRepository();
     } 
     private function createPageWithoutCategory(CreatePageModel $model, string $author){
-        $cache = Yii::$app->cache;
-        if(!$cache->exists(Constants::PAGE_ID_KEY)){
-            $cache->add(Constants::PAGE_ID_KEY, 0);
-        }
-        $cache[Constants::PAGE_ID_KEY] = $cache[Constants::PAGE_ID_KEY] + 1;
-        
-        $entity = new StaticPage();
-        Yii::error($cache[Constants::PAGE_ID_KEY]);
-        $entity->id = $cache[Constants::PAGE_ID_KEY];
+        $entity->id = -1;
         $entity->author = $author;
         $entity->accessibilityStatus = $model->accessibilityStatus;
         $entity->categoryId = $model->categoryId;
@@ -45,7 +37,6 @@ class StaticPageService implements IStaticPageService{
         $tagsToEntity = array();
         foreach ($model->tags as $tag){
             $membership = new TagStaticPageMembership();
-            $membership->pageId = $cache[Constants::PAGE_ID_KEY];
             $membership->tagName = $tag;
             array_push($tagsToEntity, $membership);
         } 
@@ -58,22 +49,17 @@ class StaticPageService implements IStaticPageService{
         $model->tags = explode(" ", $model->tags);
         try{
         $result = $this->createPageWithoutCategory($model, $author);
-        $this->pageRepository->createPage($result['entity'], $result['tagsToEntity'], new Category());
+        $id = $this->pageRepository->createPage($result['entity'], $result['tagsToEntity'], new Category());
         } catch(\Exception $e){
             throw $e;
         }
-        return $result['entity']->id;
+        return $id;
     }
     public function createPageAndCategory(CreatePageModel $model, CreateCategoryModel $c_model, string $author){
         $model->tags = explode(" ", $model->tags);
-            $cache = Yii::$app->cache;
-            if(!$cache->exists(Constants::CATEGORY_ID_KEY)){
-                $cache->add(Constants::CATEGORY_ID_KEY, -1);
-            }
-        $cache[Constants::CATEGORY_ID_KEY] = $cache[Constants::CATEGORY_ID_KEY] + 1;
         $category = new Category();
-        $category->id = $cache[Constants::CATEGORY_ID_KEY];
-        $model->categoryId=$category->id;
+        $category->id = -1;
+        $model->categoryId=-100;
         $result = $this->createPageWithoutCategory($model, $author);
         $category->name = $c_model->name;
         $category->parentId = $c_model->parentId;
