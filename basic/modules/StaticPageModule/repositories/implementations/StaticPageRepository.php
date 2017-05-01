@@ -36,13 +36,16 @@ class StaticPageRepository implements IStaticPageRepository{
         if(!empty($entity) && $entity->header != null){
             $db = Yii::$app->db;
             $transaction = $db->beginTransaction();
-            
+            $cat_array = get_object_vars($entity);
+            unset($cat_array['id']);
             try {
                 if(!empty($category) && $category->name != null)
-                    $db->createCommand()->insert($this->categoryTableName, get_object_vars($category))->execute();
+                    $db->createCommand()->insert($this->categoryTableName, $cat_array)->execute();
                 $categoryId = Yii::$app->db->createCommand('SELECT MAX(id) FROM '.$this->categoryTableName)->queryOne()['MAX(id)'];
                 $entity->categoryId = $categoryId;
-                $db->createCommand()->insert($this->pagesTableName, get_object_vars($entity))->execute();
+                $page_array = get_object_vars($entity);
+                unset($page_array['id']);
+                $db->createCommand()->insert($this->pagesTableName, $page_array)->execute();
                 $id = Yii::$app->db->createCommand('SELECT MAX(id) FROM '.$this->tableName)->queryOne()['MAX(id)'];
                 for($i = 0; $i < count($tagsToEntity); $i++){
                     $ttP = $db->createCommand();
